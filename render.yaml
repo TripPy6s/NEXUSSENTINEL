@@ -1,15 +1,19 @@
 services:
-  - type: web
-    name: nexus-sentinel-advanced-global-security
-    env: node
-    autoDeploy: true
-    buildCommand: npm ci && npm run build
-    startCommand: node dist/server.js
-    healthCheckPath: /readyz
-    # Optional: uncomment to pin a specific plan or region
-    # plan: free
-    # region: oregon
-    # Optional environment variables
-    # envVars:
-    #   - key: NODE_ENV
-    #     value: production
+- type: web
+  runtime: node
+  name: NEXUS Sentinel
+  branch: main
+  plan: starter
+  autoDeployTrigger: commit
+  buildCommand: NPM_CONFIG_PRODUCTION=false npm ci && npm run build
+  startCommand: node dist/server.js
+  healthCheckPath: /readyz
+  envVars:
+    - key: NODE_ENV
+      value: production
+    - key: RATE_LIMIT_PER_MINUTE
+      value: "100"
+    - key: RATE_LIMIT_AUTHZ_PER_MINUTE
+      value: "10"
+    - key: HSTS_MAX_AGE
+      value: "15552000"

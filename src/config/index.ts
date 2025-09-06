@@ -42,8 +42,14 @@ export function getConfig(): AppConfig {
     .filter(Boolean);
   const corsOrigins = corsEnv.length === 0 ? [] : corsEnv;
 
-  const rateLimitDefault = Number(process.env.RATE_LIMIT_DEFAULT_PER_MIN ?? (isProd ? 100 : isDev ? 1000 : 0));
-  const rateLimitAuth = Number(process.env.RATE_LIMIT_AUTH_PER_MIN ?? (isProd ? 10 : isDev ? 0 : 0));
+  const rateDefaultEnv =
+    process.env.RATE_LIMIT_DEFAULT_PER_MIN ?? process.env.RATE_LIMIT_PER_MINUTE;
+  const rateAuthEnv =
+    process.env.RATE_LIMIT_AUTH_PER_MIN ?? process.env.RATE_LIMIT_AUTHZ_PER_MINUTE;
+  const rateLimitDefault = Number(
+    rateDefaultEnv ?? (isProd ? 100 : isDev ? 1000 : 0)
+  );
+  const rateLimitAuth = Number(rateAuthEnv ?? (isProd ? 10 : isDev ? 0 : 0));
 
   const config: AppConfig = {
     env,
