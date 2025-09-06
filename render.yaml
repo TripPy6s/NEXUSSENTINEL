@@ -4,8 +4,8 @@ services:
     env: node
     autoDeploy: true
     buildCommand: npm ci && npm run build
-    startCommand: node dist/server/index.js
-    healthCheckPath: /health
+    startCommand: node dist/server.js
+    healthCheckPath: /readyz
     # Optional: uncomment to pin a specific plan or region
     # plan: free
     # region: oregon
