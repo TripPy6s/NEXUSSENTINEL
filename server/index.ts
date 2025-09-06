@@ -1,4 +1,4 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -15,4 +15,7 @@ app.get("/health", (_req, res) => {
 });
 
 const PORT = Number(process.env.PORT) || 200;
-app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
+const HOST = "0.0.0.0"; // required for cloud
+app.listen(PORT, HOST, () => {
+  console.log(`Listening on http://${HOST}:${PORT}`);
+});
