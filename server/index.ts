@@ -14,6 +14,15 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true, ts: Date.now() });
 });
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    name: "Nexus Sentinel API",
+    message: "Service is running",
+    health: "/health",
+    ts: Date.now(),
+  });
+});
+
 const PORT = Number(process.env.PORT) || 200;
 const HOST = "0.0.0.0"; // required for cloud
 app.listen(PORT, HOST, () => {
