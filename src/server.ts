@@ -9,6 +9,7 @@ import morgan from "morgan";
 import promClient from "prom-client";
 import { getConfig, isDevelopment, isProduction, isTest } from "./config";
 import { getRequestId, requestId, requestIdHeader } from "./middleware/requestId";
+import { randomUUID } from "crypto";
 
 const cfg = getConfig();
 
@@ -34,7 +35,7 @@ app.use(requestId);
 app.use(
   pinoHttp({
     logger,
-    genReqId: (req, res) => getRequestId(req) || undefined,
+    genReqId: (req, res) => getRequestId(req) ?? randomUUID(),
     customProps: (req) => ({ env: cfg.env, service: cfg.serviceName }),
     autoLogging: true,
   })
@@ -57,22 +58,21 @@ app.use(
 
 // Helmet
 if (cfg.security.enableHelmet) {
-  const helmetOptions: Parameters<typeof helmet>[0] = {};
-  if (cfg.security.enableCSP) {
-    helmetOptions.contentSecurityPolicy = {
-      useDefaults: true,
-      directives: {
-        defaultSrc: ["'self'"],
-      },
-    } as any;
-  } else {
-    helmetOptions.contentSecurityPolicy = false as any;
-  }
-  if (cfg.security.enableHSTS) {
-    helmetOptions.hsts = { maxAge: Number(process.env.HSTS_MAX_AGE ?? 15552000) } as any; // 180 days
-  }
-  helmetOptions.referrerPolicy = { policy: "no-referrer" } as any;
-  helmetOptions.frameguard = { action: "deny" } as any;
+  const helmetOptions: Parameters<typeof helmet>[0] = {
+    contentSecurityPolicy: cfg.security.enableCSP
+      ? ({
+          useDefaults: true,
+          directives: {
+            defaultSrc: ["'self'"],
+          },
+        } as any)
+      : false,
+    ...(cfg.security.enableHSTS
+      ? { hsts: ({ maxAge: Number(process.env.HSTS_MAX_AGE ?? 15552000) } as any) }
+      : {}),
+    referrerPolicy: ({ policy: "no-referrer" } as any),
+    frameguard: ({ action: "deny" } as any),
+  };
   app.use(helmet(helmetOptions));
 }
 
